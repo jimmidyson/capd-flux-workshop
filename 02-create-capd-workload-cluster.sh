@@ -17,7 +17,7 @@ mkdir -p "${LOCAL_MANIFESTS_DIR}"
 
 kubectl get cluster "${WORKLOAD_CLUSTER_NAME}" &>/dev/null || ( \
   print "Creating workload cluster ${WORKLOAD_CLUSTER_NAME}"
-  env CUSTOM_NODE_IMAGE=jimmidyson/kind-capi-flux-workshop:v1.22.2@sha256:7c46d0dddeea2fdba5bccaddd3efa7789194ee1b333540a708cc2890213fdf2c \
+  env CUSTOM_NODE_IMAGE=jimmidyson/kind-capi-flux-workshop:v1.22.2@sha256:42aaba262d841693da2b2efb2f4bf3f013db4adc60ed19186daa2e867e5f6c8f \
     clusterctl generate cluster "${WORKLOAD_CLUSTER_NAME}" \
       --kubernetes-version "v1.22.2" \
       --from capd-cluster-template.yaml > "${LOCAL_MANIFESTS_DIR}/${WORKLOAD_CLUSTER_NAME}.yaml";

@@ -50,12 +50,25 @@ NODE_ARM64_CONTAINER="$(docker run -d --privileged  --platform linux/arm64 --ent
 readonly NODE_ARM64_CONTAINER
 trap 'docker rm -fv "${NODE_ARM64_CONTAINER}" &>/dev/null || true' EXIT
 
-declare -ra CALICO_IMAGES=(calico/node:v3.20.1 \
-                           calico/cni:v3.20.1 \
-                           calico/kube-controllers:v3.20.1 \
-                           calico/pod2daemon-flexvol:v3.20.1)
+IFS=$'\n' read -r -d '' -a CALICO_IMAGES < <(curl -fsSL https://docs.projectcalico.org/v3.20/manifests/calico.yaml | \
+  gojq --yaml-input -r \
+    '. | select(. != null) |
+      select(.kind | test("^(Deployment|DaemonSet)$")) |
+      ([.spec.template.spec.containers[].image] | unique)+
+      ([.spec.template.spec | select(.initContainers != null) | .initContainers[].image] | unique) |
+      .[]' \
+  && printf '\0')
 
-for IMAGE in "${CAPI_IMAGES[@]}" "${CALICO_IMAGES[@]}"; do
+IFS=$'\n' read -r -d '' -a FLUX_IMAGES < <( flux install --export | \
+  gojq --yaml-input -r \
+    '. | select(. != null) |
+      select(.kind | test("^(Deployment|DaemonSet)$")) |
+      ([.spec.template.spec.containers[].image] | unique)+
+      ([.spec.template.spec | select(.initContainers != null) | .initContainers[].image] | unique) |
+      .[]' \
+  && printf '\0')
+
+for IMAGE in "${CAPI_IMAGES[@]}" "${CALICO_IMAGES[@]}" "${FLUX_IMAGES[@]}"; do
   docker pull --platform=amd64 "${IMAGE}"
   docker save "${IMAGE}" | \
     docker exec -i "${NODE_AMD64_CONTAINER}" ctr --namespace=k8s.io image import --no-unpack -
