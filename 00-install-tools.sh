@@ -70,25 +70,6 @@ test -f "${BINDIR}"/clusterctl || (
 )
 chmod +x "${BINDIR}"/clusterctl
 
-test -f "${BINDIR}"/gojq || (
-  print "Downloading gojq..."
-  case "${OS}" in
-    linux)
-      curl -fsSL https://github.com/itchyny/gojq/releases/download/v0.12.5/gojq_v0.12.5_"${OS}"_"${ARCH}".tar.gz |
-        tar xz -C "${BINDIR}" --strip-components 1 --wildcards -- */gojq
-      ;;
-    darwin)
-      curl -fsSLo "${SCRIPT_DIR}/.local/gojq_v0.12.5_${OS}_${ARCH}.zip" https://github.com/itchyny/gojq/releases/download/v0.12.5/gojq_v0.12.5_"${OS}"_"${ARCH}".zip
-      trap 'rm -rf "${SCRIPT_DIR}"/.local/gojq_* "${SCRIPT_DIR}"/.local/bin/gojq_*' EXIT
-      pushd "${BINDIR}" &>/dev/null
-      unzip "${SCRIPT_DIR}/.local/gojq_v0.12.5_${OS}_${ARCH}.zip"
-      mv gojq_*/gojq .
-      popd &>/dev/null
-      ;;
-  esac
-)
-chmod +x "${BINDIR}"/clusterctl
-
 print "$(printf 'Tools downloaded to %s. Please configure your PATH with:\n' "${BINDIR}")" >/dev/stderr
 # shellcheck disable=SC2016
 printf '\nexport PATH="%s:${PATH}"\n' "${BINDIR}"

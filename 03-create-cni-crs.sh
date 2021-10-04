@@ -20,19 +20,7 @@ kubectl get configmap calico-manifests &>/dev/null || ( \
     kubectl create configmap calico-manifests --from-file=calico.yaml=/dev/stdin
 )
 
-kubectl apply -f - <<EOF
-apiVersion: addons.cluster.x-k8s.io/v1alpha4
-kind: ClusterResourceSet
-metadata:
-  name: calico-cni
-spec:
-  clusterSelector:
-    matchLabels:
-      cni: calico
-  resources:
-    - kind: ConfigMap
-      name: calico-manifests
-EOF
+kubectl apply -f calico-manifests-crs.yaml
 
 until kubectl --context="${WORKLOAD_CLUSTER_NAME}" -n kube-system get daemonset calico-node &>/dev/null; do
   sleep 1
