@@ -21,7 +21,9 @@ kubectl get cluster "${WORKLOAD_CLUSTER_NAME}" &>/dev/null || ( \
     clusterctl generate cluster "${WORKLOAD_CLUSTER_NAME}" \
       --kubernetes-version "v1.22.2" \
       --from capd-cluster-template.yaml > "${LOCAL_MANIFESTS_DIR}/${WORKLOAD_CLUSTER_NAME}.yaml";
-  kubectl create -f "${LOCAL_MANIFESTS_DIR}/${WORKLOAD_CLUSTER_NAME}.yaml";
+  until kubectl apply -f "${LOCAL_MANIFESTS_DIR}/${WORKLOAD_CLUSTER_NAME}.yaml"; do
+    sleep 1;
+  done
 )
 
 kubectl label --overwrite cluster "${WORKLOAD_CLUSTER_NAME}" cni=calico
