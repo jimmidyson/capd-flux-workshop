@@ -18,7 +18,7 @@ if kubectl get clusters -A &>/dev/null; then
 fi
 
 print "Deleting management KIND cluster..."
-(kind get clusters | grep -Eo "^${KIND_CLUSTER_NAME}$" && kind delete cluster --name "${KIND_CLUSTER_NAME}") || true
+(kind get clusters | grep -Eo "^${KIND_CLUSTER_NAME}$" &>/dev/null && kind delete cluster --name "${KIND_CLUSTER_NAME}") || true
 
 rm -rf -- .local
 
