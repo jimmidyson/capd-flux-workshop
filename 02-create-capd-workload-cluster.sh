@@ -34,11 +34,11 @@ print "Configuring kubeconfig for workload cluster ${WORKLOAD_CLUSTER_NAME}..."
 CURRENT_CONTEXT="$(kubectl config current-context)"
 clusterctl get kubeconfig "${WORKLOAD_CLUSTER_NAME}" > "${SCRIPT_DIR}/.local/${WORKLOAD_CLUSTER_NAME}.kubeconfig"
 
-# if [ "$(uname | tr '[:upper:]' '[:lower:]')" == 'darwin' ]; then
+if [ "$(uname | tr '[:upper:]' '[:lower:]')" == 'darwin' ]; then
   kubectl --kubeconfig="${SCRIPT_DIR}/.local/${WORKLOAD_CLUSTER_NAME}.kubeconfig" config set-cluster "${WORKLOAD_CLUSTER_NAME}" \
     --server="https://$(docker port "${WORKLOAD_CLUSTER_NAME}"-lb 6443/tcp | sed "s/0.0.0.0/127.0.0.1/")" \
     --insecure-skip-tls-verify=true
-# fi
+fi
 
 env KUBECONFIG="${SCRIPT_DIR}/.local/${WORKLOAD_CLUSTER_NAME}.kubeconfig:${KUBECONFIG}" kubectl config view --flatten > \
   "${SCRIPT_DIR}/.local/.kubeconfig.tmp"

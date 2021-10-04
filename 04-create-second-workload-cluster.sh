@@ -8,7 +8,7 @@ readonly SCRIPT_DIR
 # shellcheck disable=SC1091
 source "${SCRIPT_DIR}/utils.sh"
 
-declare -r WORKLOAD_CLUSTER_NAME="${WORKLOAD_CLUSTER_NAME:-demo-cluster-2}"
+export WORKLOAD_CLUSTER_NAME="${WORKLOAD_CLUSTER_NAME:-demo-cluster-2}"
 
 "${SCRIPT_DIR}"/02-create-capd-workload-cluster.sh
 
