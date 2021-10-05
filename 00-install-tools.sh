@@ -70,6 +70,12 @@ test -f "${BINDIR}"/clusterctl || (
 )
 chmod +x "${BINDIR}"/clusterctl
 
+test -f "${BINDIR}"/kustomize || (
+  print "Downloading kustomize..."
+  curl -fsSL https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv4.4.0/kustomize_v4.4.0_"${OS}"_"${ARCH}".tar.gz |
+    tar xz -C "${BINDIR}"
+)
+
 print "$(printf 'Tools downloaded to %s. Please configure your PATH with:\n' "${BINDIR}")" >/dev/stderr
 # shellcheck disable=SC2016
 printf '\nexport PATH="%s:${PATH}"\n' "${BINDIR}"

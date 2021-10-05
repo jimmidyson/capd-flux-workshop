@@ -12,7 +12,7 @@ export PATH="${SCRIPT_DIR}/.local/bin:${PATH}"
 export KUBECONFIG="${SCRIPT_DIR}/.local/kubeconfig"
 export WORKLOAD_CLUSTER_NAME="${WORKLOAD_CLUSTER_NAME:-demo-cluster-2}"
 
-env WORKER_MACHINE_COUNT=0 "${SCRIPT_DIR}"/02-create-capd-workload-cluster.sh
+"${SCRIPT_DIR}"/02-create-capd-workload-cluster.sh
 
 until kubectl --context="${WORKLOAD_CLUSTER_NAME}" -n kube-system get daemonset calico-node; do
   sleep 1
