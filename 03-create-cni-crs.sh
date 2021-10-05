@@ -8,6 +8,7 @@ readonly SCRIPT_DIR
 # shellcheck disable=SC1091
 source "${SCRIPT_DIR}/utils.sh"
 
+export PATH="${SCRIPT_DIR}/.local/bin:${PATH}"
 export KUBECONFIG="${SCRIPT_DIR}/.local/kubeconfig"
 
 declare -r WORKLOAD_CLUSTER_NAME="${WORKLOAD_CLUSTER_NAME:-demo-cluster-1}"

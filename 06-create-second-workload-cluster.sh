@@ -8,11 +8,11 @@ readonly SCRIPT_DIR
 # shellcheck disable=SC1091
 source "${SCRIPT_DIR}/utils.sh"
 
+export PATH="${SCRIPT_DIR}/.local/bin:${PATH}"
 export KUBECONFIG="${SCRIPT_DIR}/.local/kubeconfig"
 export WORKLOAD_CLUSTER_NAME="${WORKLOAD_CLUSTER_NAME:-demo-cluster-2}"
 
-"${SCRIPT_DIR}"/02-create-capd-workload-cluster.sh
-
+env WORKER_MACHINE_COUNT=0 "${SCRIPT_DIR}"/02-create-capd-workload-cluster.sh
 
 until kubectl --context="${WORKLOAD_CLUSTER_NAME}" -n kube-system get daemonset calico-node; do
   sleep 1

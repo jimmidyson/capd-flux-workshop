@@ -10,6 +10,7 @@ source "${SCRIPT_DIR}/utils.sh"
 
 readonly KIND_CLUSTER_NAME='d2iq-capi-flux-workshop'
 
+export PATH="${SCRIPT_DIR}/.local/bin:${PATH}"
 export KUBECONFIG="${SCRIPT_DIR}/.local/kubeconfig"
 
 if ! kind get clusters 2>/dev/null | grep -Eo "^${KIND_CLUSTER_NAME}$"; then

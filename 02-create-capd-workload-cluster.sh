@@ -8,6 +8,7 @@ readonly SCRIPT_DIR
 # shellcheck disable=SC1091
 source "${SCRIPT_DIR}/utils.sh"
 
+export PATH="${SCRIPT_DIR}/.local/bin:${PATH}"
 export KUBECONFIG="${SCRIPT_DIR}/.local/kubeconfig"
 
 declare -r WORKLOAD_CLUSTER_NAME="${WORKLOAD_CLUSTER_NAME:-demo-cluster-1}"
@@ -18,6 +19,7 @@ mkdir -p "${LOCAL_MANIFESTS_DIR}"
 if ! kubectl get cluster "${WORKLOAD_CLUSTER_NAME}" &>/dev/null; then
   print "Creating workload cluster ${WORKLOAD_CLUSTER_NAME}"
   env CUSTOM_NODE_IMAGE=jimmidyson/kind-capi-flux-workshop:v1.22.2@sha256:42aaba262d841693da2b2efb2f4bf3f013db4adc60ed19186daa2e867e5f6c8f \
+    WORKER_MACHINE_COUNT="${WORKER_MACHINE_COUNT:-1}" \
     clusterctl generate cluster "${WORKLOAD_CLUSTER_NAME}" \
       --kubernetes-version "v1.22.2" \
       --from capd-cluster-template.yaml > "${LOCAL_MANIFESTS_DIR}/${WORKLOAD_CLUSTER_NAME}.yaml";
@@ -34,6 +36,7 @@ kubectl wait --for=condition=Ready --timeout=5m \
 
 print "Configuring kubeconfig for workload cluster ${WORKLOAD_CLUSTER_NAME}..."
 CURRENT_CONTEXT="$(kubectl config current-context)"
+readonly CURRENT_CONTEXT
 clusterctl get kubeconfig "${WORKLOAD_CLUSTER_NAME}" > "${SCRIPT_DIR}/.local/${WORKLOAD_CLUSTER_NAME}.kubeconfig"
 
 if [ "$(uname | tr '[:upper:]' '[:lower:]')" == 'darwin' ]; then
