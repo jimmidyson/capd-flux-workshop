@@ -18,13 +18,13 @@ mkdir -p "${LOCAL_MANIFESTS_DIR}"
 
 if ! kubectl get cluster "${WORKLOAD_CLUSTER_NAME}" &>/dev/null; then
   print "Creating workload cluster ${WORKLOAD_CLUSTER_NAME}"
-  env CUSTOM_NODE_IMAGE=jimmidyson/kind-capi-flux-workshop:v1.22.2@sha256:42aaba262d841693da2b2efb2f4bf3f013db4adc60ed19186daa2e867e5f6c8f \
+  CUSTOM_NODE_IMAGE=jimmidyson/kind-capi-flux-workshop:v1.22.2@sha256:42aaba262d841693da2b2efb2f4bf3f013db4adc60ed19186daa2e867e5f6c8f \
     WORKER_MACHINE_COUNT="${WORKER_MACHINE_COUNT:-1}" \
     clusterctl generate cluster "${WORKLOAD_CLUSTER_NAME}" \
       --kubernetes-version "v1.22.2" \
-      --from capd-cluster-template.yaml > "${LOCAL_MANIFESTS_DIR}/${WORKLOAD_CLUSTER_NAME}.yaml";
+      --from capd-cluster-template.yaml > "${LOCAL_MANIFESTS_DIR}/${WORKLOAD_CLUSTER_NAME}.yaml"
   until kubectl apply -f "${LOCAL_MANIFESTS_DIR}/${WORKLOAD_CLUSTER_NAME}.yaml"; do
-    sleep 1;
+    sleep 1
   done
 fi
 
@@ -45,7 +45,7 @@ if [ "$(uname | tr '[:upper:]' '[:lower:]')" == 'darwin' ]; then
     --insecure-skip-tls-verify=true
 fi
 
-env KUBECONFIG="${SCRIPT_DIR}/.local/${WORKLOAD_CLUSTER_NAME}.kubeconfig:${KUBECONFIG}" kubectl config view --flatten > \
+KUBECONFIG="${SCRIPT_DIR}/.local/${WORKLOAD_CLUSTER_NAME}.kubeconfig:${KUBECONFIG}" kubectl config view --flatten > \
   "${SCRIPT_DIR}/.local/.kubeconfig.tmp"
 mv "${SCRIPT_DIR}/.local/.kubeconfig.tmp" "${KUBECONFIG}"
 if kubectl config get-contexts "${WORKLOAD_CLUSTER_NAME}" 2>/dev/null; then
