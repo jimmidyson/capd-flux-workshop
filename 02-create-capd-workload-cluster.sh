@@ -15,7 +15,7 @@ declare -r WORKLOAD_CLUSTER_NAME="${WORKLOAD_CLUSTER_NAME:-demo-cluster-1}"
 declare -r LOCAL_MANIFESTS_DIR="${SCRIPT_DIR}/.local/manifests"
 mkdir -p "${LOCAL_MANIFESTS_DIR}"
 
-kubectl get cluster "${WORKLOAD_CLUSTER_NAME}" &>/dev/null || ( \
+if ! kubectl get cluster "${WORKLOAD_CLUSTER_NAME}" &>/dev/null; then
   print "Creating workload cluster ${WORKLOAD_CLUSTER_NAME}"
   env CUSTOM_NODE_IMAGE=jimmidyson/kind-capi-flux-workshop:v1.22.2@sha256:42aaba262d841693da2b2efb2f4bf3f013db4adc60ed19186daa2e867e5f6c8f \
     clusterctl generate cluster "${WORKLOAD_CLUSTER_NAME}" \
@@ -24,7 +24,7 @@ kubectl get cluster "${WORKLOAD_CLUSTER_NAME}" &>/dev/null || ( \
   until kubectl apply -f "${LOCAL_MANIFESTS_DIR}/${WORKLOAD_CLUSTER_NAME}.yaml"; do
     sleep 1;
   done
-)
+fi
 
 kubectl label --overwrite cluster "${WORKLOAD_CLUSTER_NAME}" cni=calico
 
@@ -45,6 +45,8 @@ fi
 env KUBECONFIG="${SCRIPT_DIR}/.local/${WORKLOAD_CLUSTER_NAME}.kubeconfig:${KUBECONFIG}" kubectl config view --flatten > \
   "${SCRIPT_DIR}/.local/.kubeconfig.tmp"
 mv "${SCRIPT_DIR}/.local/.kubeconfig.tmp" "${KUBECONFIG}"
-kubectl config delete-context "${WORKLOAD_CLUSTER_NAME}" 2>/dev/null || true
+if kubectl config get-contexts "${WORKLOAD_CLUSTER_NAME}" 2>/dev/null; then
+  kubectl config delete-context "${WORKLOAD_CLUSTER_NAME}"
+fi
 kubectl config rename-context "${WORKLOAD_CLUSTER_NAME}-admin@${WORKLOAD_CLUSTER_NAME}" "${WORKLOAD_CLUSTER_NAME}"
 kubectl config use-context "${CURRENT_CONTEXT}"

@@ -9,6 +9,7 @@ readonly SCRIPT_DIR
 source "${SCRIPT_DIR}/utils.sh"
 
 for f in ./[0-9][0-9]*.sh; do
+  printf "\n"
   print "Executing ${f}..."
-  ./"${f}"
+  env PRINT_INDENT="  " ./"${f}"
 done

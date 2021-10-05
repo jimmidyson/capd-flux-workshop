@@ -30,8 +30,8 @@ readonly CAPI_VERSION
 
 export KUBECONFIG="${TEMPDIR}"/kubeconfig
 declare -r KIND_CLUSTER_NAME="capi-images-gathering"
-trap 'kind delete cluster --name "${KIND_CLUSTER_NAME}" &>/dev/null || true' EXIT
 kind create cluster --name "${KIND_CLUSTER_NAME}" --image jimmidyson/kind-node:"${KUBERNETES_VERSION}"
+trap 'kind delete cluster --name "${KIND_CLUSTER_NAME}"' EXIT
 
 IFS=$'\n' read -r -d '' -a CAPI_IMAGES < <( clusterctl init \
   --core "cluster-api:${CAPI_VERSION}" \
@@ -44,11 +44,11 @@ kind delete cluster --name "${KIND_CLUSTER_NAME}"
 
 NODE_AMD64_CONTAINER="$(docker run -d --privileged --platform linux/amd64 --entrypoint containerd jimmidyson/kind-node:"${KUBERNETES_VERSION}"-amd64)"
 readonly NODE_AMD64_CONTAINER
-trap 'docker rm -fv "${NODE_AMD64_CONTAINER}" &>/dev/null || true' EXIT
+trap 'docker rm -fv "${NODE_AMD64_CONTAINER}"' EXIT
 
 NODE_ARM64_CONTAINER="$(docker run -d --privileged  --platform linux/arm64 --entrypoint containerd jimmidyson/kind-node:"${KUBERNETES_VERSION}"-arm64)"
 readonly NODE_ARM64_CONTAINER
-trap 'docker rm -fv "${NODE_ARM64_CONTAINER}" &>/dev/null || true' EXIT
+trap 'docker rm -fv "${NODE_ARM64_CONTAINER}"' EXIT
 
 IFS=$'\n' read -r -d '' -a CALICO_IMAGES < <(curl -fsSL https://docs.projectcalico.org/v3.20/manifests/calico.yaml | \
   gojq --yaml-input -r \

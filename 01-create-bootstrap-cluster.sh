@@ -12,10 +12,10 @@ readonly KIND_CLUSTER_NAME='d2iq-capi-flux-workshop'
 
 export KUBECONFIG="${SCRIPT_DIR}/.local/kubeconfig"
 
-(kind get clusters 2>/dev/null | grep -Eo "^${KIND_CLUSTER_NAME}$" &>/dev/null) || ( \
+if ! kind get clusters 2>/dev/null | grep -Eo "^${KIND_CLUSTER_NAME}$"; then
   print "Creating bootstrap cluster...";
   kind create cluster --name "${KIND_CLUSTER_NAME}" --config "${SCRIPT_DIR}"/kind-config.yaml;
-)
+fi
 
 CAPI_VERSION="$(clusterctl version -o=short)"
 readonly CAPI_VERSION

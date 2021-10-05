@@ -15,10 +15,10 @@ declare -r WORKLOAD_CLUSTER_NAME="${WORKLOAD_CLUSTER_NAME:-demo-cluster-1}"
 kubectl --context="${WORKLOAD_CLUSTER_NAME}" get nodes
 
 print "Ensuring CNI is configured for workload clusters"
-kubectl get configmap calico-manifests &>/dev/null || ( \
+if ! kubectl get configmap calico-manifests &>/dev/null; then
   curl -fsSL https://docs.projectcalico.org/v3.20/manifests/calico.yaml | \
     kubectl create configmap calico-manifests --from-file=calico.yaml=/dev/stdin
-)
+fi
 
 kubectl apply -f calico-manifests-crs.yaml
 
